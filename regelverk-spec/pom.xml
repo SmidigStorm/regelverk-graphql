@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>no.regelverk</groupId>
+        <artifactId>regelverk-parent</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>regelverk-spec</artifactId>
+    <name>Regelverk GraphQL Specification</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>no.regelverk</groupId>
+            <artifactId>regelverk-db</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>no.regelverk</groupId>
+            <artifactId>regelverk-service</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>no.sikt</groupId>
+            <artifactId>graphitron-common</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>no.sikt</groupId>
+                <artifactId>graphitron-maven-plugin</artifactId>
+                <version>${graphitron.version}</version>
+                <executions>
+                    <execution>
+                        <id>generate-graphql</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <schemaDir>${project.basedir}/src/main/resources/graphql</schemaDir>
+                            <outputPackage>${generatedCodePackage}.graphql</outputPackage>
+                            <jooqPackage>${generatedJooqPackage}</jooqPackage>
+                            <generateDataFetchers>true</generateDataFetchers>
+                            <generateMutations>true</generateMutations>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

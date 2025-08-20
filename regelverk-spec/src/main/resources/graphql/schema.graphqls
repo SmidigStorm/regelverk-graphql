@@ -1,0 +1,113 @@
+# Main GraphQL Schema for Regelverk System
+# Vi bygger opp systemet én entitet om gangen
+
+schema {
+    query: Query
+    mutation: Mutation
+}
+
+# The Node interface for Relay-style object identification
+interface Node {
+    id: ID!
+}
+
+# Root Query type
+type Query {
+    # Hent alle institusjoner
+    institusjoner(
+        first: Int = 100
+        after: String
+    ): InstitusjonConnection
+    
+    # Hent en spesifikk institusjon
+    institusjon(id: ID!): Institusjon
+    
+    # Søk institusjoner basert på type
+    institusjonerByType(type: InstitusjonType!): [Institusjon] @asConnection
+    
+    # Node query for Relay compatibility
+    node(id: ID!): Node
+}
+
+# Root Mutation type
+type Mutation {
+    # Opprett ny institusjon
+    createInstitusjon(input: CreateInstitusjonInput!): Institusjon @mutation(typeName: INSERT)
+    
+    # Oppdater eksisterende institusjon
+    updateInstitusjon(input: UpdateInstitusjonInput!): Institusjon @mutation(typeName: UPDATE)
+    
+    # Slett institusjon (soft delete - setter aktiv = false)
+    deleteInstitusjon(id: ID! @nodeId(typeName: "Institusjon")): Boolean @mutation(typeName: DELETE)
+}
+
+# Institusjon - Utdanningsinstitusjoner
+type Institusjon implements Node @node @table {
+    # Unik ID (UUID)
+    id: ID!
+    
+    # Institusjonskode (f.eks. NTNU, UIO)
+    kode: String!
+    
+    # Fullt navn på institusjonen
+    navn: String!
+    
+    # Kort navn / akronym
+    kortNavn: String @field(name: "KORT_NAVN")
+    
+    # Type institusjon
+    type: InstitusjonType
+    
+    # Om institusjonen er aktiv
+    aktiv: Boolean
+    
+    # Når institusjonen ble opprettet i systemet
+    opprettet: String
+    
+    # Sist oppdatert
+    oppdatert: String
+}
+
+# Enum for institusjonstyper
+enum InstitusjonType {
+    UNIVERSITET
+    HOGSKOLE
+    FAGSKOLE
+}
+
+# Connection type for pagination
+type InstitusjonConnection {
+    edges: [InstitusjonEdge]
+    pageInfo: PageInfo!
+    nodes: [Institusjon!]!
+    totalCount: Int
+}
+
+type InstitusjonEdge {
+    cursor: String!
+    node: Institusjon!
+}
+
+type PageInfo {
+    hasNextPage: Boolean!
+    hasPreviousPage: Boolean!
+    startCursor: String
+    endCursor: String
+}
+
+# Input types for mutations
+input CreateInstitusjonInput {
+    kode: String!
+    navn: String!
+    kortNavn: String
+    type: InstitusjonType
+}
+
+input UpdateInstitusjonInput {
+    id: ID! @nodeId(typeName: "Institusjon")
+    kode: String
+    navn: String
+    kortNavn: String
+    type: InstitusjonType
+    aktiv: Boolean
+}

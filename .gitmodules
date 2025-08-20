@@ -1,0 +1,3 @@
+[submodule "graphitron"]
+	path = graphitron
+	url = git@github.com:sikt-no/graphitron.git
